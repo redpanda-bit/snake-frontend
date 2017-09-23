@@ -1,7 +1,16 @@
-<<<<<<< HEAD
-# front-end
-Flatiron javascript module 3 project
-=======
 # snake-frontend
 Snake game using Javascript with Object Orientation principles
->>>>>>> 81145094ea53d90168c089748ae991af741fc78d
+
+Collaborated with other developers to practice Javascript and Object Orientation principles. Please find most relevant work on src/index.js.
+
+To run on your computer: 
+
+--assuming you have Git CLI installed
+
+`git clone git@github.com:carlosalmonte04/snake-frontend.git`
+
+`cd snake-frontend`
+
+`open index.html`
+
+Thanks for stopping by!
