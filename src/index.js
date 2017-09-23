@@ -16,6 +16,9 @@ $(document).ready(function() {
     let rightBound  = 586
     let topBound    = -1
     let bottomBound = 391
+    
+    const DIRECTIONS         = [ 37, 38, 39, 40 ]  
+    const oppositeDirections = { 37: 39, 38: 40, 39: 37, 40: 38 }
 
     const moves = []
     let user    = ''
@@ -34,11 +37,7 @@ $(document).ready(function() {
           handleGameLost()
         }
       })
-      function snakeEatsFood() {
-        return (snakeHead.coordinates[0] === food.coordinates[0] && snakeHead.coordinates[1] === food.coordinates[1] )
-      }
 
-      //runs the actual playing of the game
       if (snakeAlive && game.gameOn) {
 
         snakeHead.advance()
@@ -46,7 +45,6 @@ $(document).ready(function() {
         Tail.advanceAll()
 
         if (snakeEatsFood()) {
-
 
           food = new Food()
           playground.html(food.render())
@@ -62,13 +60,17 @@ $(document).ready(function() {
         playground.html(snakeHead.render() + Tail.renderAll() + food.render())
       }
 
-
     }, 50)
 
-    //event listener for submit new user
+
+// ////////
+//
+// Users functionalities not yet implemented
+//
+///////////
+
     $('#user-form-container').click(function(event) {
       if (event.target.id === 'submit-user') {
-        // debugger
         game.gameReady = true
         user = submitUser() //this returns a new User
         game.user = user
@@ -76,89 +78,38 @@ $(document).ready(function() {
       }
     })
 
-    //event listener for submit new user
     $('#saved-games-container').click(function(event) {
       if (event.target.id === 'resume-saved-game') {
         retrieveGame()
       }
     })
 
-
-
     $(document).on('keydown', function(event) {
+
       if (game.gameOn) { // DONT LISTEN FOR KEY PRESSED IF GAME IS PAUSED/OVER
         event.preventDefault()
       }
-      // MOVEMENT CONTROLLER
+
       if (snakeHead.bearingChangeChecker === false) {
-        switch (event.keyCode) {
-          case 38: //up arrow
-            // debugger
-            if (game.gameOn && snakeHead.bearing !== "down" && snakeHead.bearing !== "up") {
-              snakeHead.bearing = "up"
-              moves.push({
-                coordinates: snakeHead.coordinates.slice(),
-                bearing: snakeHead.bearing.slice()
-              })
-              snakeHead.tailBlocks.forEach(tailBlock => tailBlock.moves.push(moves.slice(-1)[0]))
-                // disallow bearing from changing until snakeHead advances again
-              snakeHead.bearingChangeChecker = true
 
-              snakeHead.tailBlocks.forEach(tailBlock => console.log(tailBlock.id, tailBlock.moves))
-            }
-            break;
-          case 40: //down arrow
-            if (game.gameOn && snakeHead.bearing !== "up" && snakeHead.bearing !== "down") {
-              snakeHead.bearing = "down"
-              moves.push({
-                coordinates: snakeHead.coordinates.slice(),
-                bearing: snakeHead.bearing.slice()
-              })
-              snakeHead.tailBlocks.forEach(tailBlock => tailBlock.moves.push(moves.slice(-1)[0]))
-              snakeHead.bearingChangeChecker = true
+        if (DIRECTIONS.includes(event.keyCode) && game.gameOn) {
+          changeBearing(event.keyCode)
+          pushMoveToMoves(snakeHead)
 
-              snakeHead.tailBlocks.forEach(tailBlock => console.log(tailBlock.id, tailBlock.moves))
-            }
-            break;
-          case 37: // left arrow
-            if (game.gameOn && snakeHead.bearing !== "right" && snakeHead.bearing !== "left") {
-              snakeHead.bearing = "left"
-              moves.push({
-                coordinates: snakeHead.coordinates.slice(),
-                bearing: snakeHead.bearing.slice()
-              })
-              snakeHead.tailBlocks.forEach(tailBlock => tailBlock.moves.push(moves.slice(-1)[0]))
-              snakeHead.bearingChangeChecker = true
+        }
 
-              snakeHead.tailBlocks.forEach(tailBlock => console.log(tailBlock.id, tailBlock.moves))
+        if (event.keyCode === 32) { //spacebar pauses the game
+          if (game.gameReady) {
+            event.preventDefault()
+            game.gameOn = !game.gameOn
+            if (game.gameOn) {
+              gameFlow
+              $('#play-instructions').addClass('animated fadeOutUp')
+              $('#score').fadeIn()
+              $('#save-game').fadeIn()
             }
-            break;
-          case 39: //right arrow
-            if (game.gameOn && snakeHead.bearing !== "left" && snakeHead.bearing !== "right") {
-              snakeHead.bearing = "right"
-              moves.push({
-                coordinates: snakeHead.coordinates.slice(),
-                bearing: snakeHead.bearing.slice()
-              })
-              snakeHead.tailBlocks.forEach(tailBlock => tailBlock.moves.push(moves.slice(-1)[0]))
-              snakeHead.bearingChangeChecker = true
-
-              snakeHead.tailBlocks.forEach(tailBlock => console.log(tailBlock.id, tailBlock.moves))
-            }
-            break;
-          case 32: //spacebar pauses the game
-            if (game.gameReady) {
-              event.preventDefault()
-              game.gameOn = !game.gameOn
-              if (game.gameOn) {
-                gameFlow
-                $('#play-instructions').addClass('animated fadeOutUp')
-                $('#score').fadeIn()
-                $('#save-game').fadeIn()
-              }
-              if (!game.gameOn) {}
-            }
-            break;
+            if (!game.gameOn) {}
+          }
         }
       }
     })
@@ -182,8 +133,6 @@ $(document).ready(function() {
     })
 
 
-
-
     ////////////////
     //
     // HELPER FUNCTIONS 
@@ -196,6 +145,10 @@ $(document).ready(function() {
 
     function snakeAteItself(tailBlock) {
       return snakeHead.coordinates[0] === tailBlock.coordinates[0] && snakeHead.coordinates[1] === tailBlock.coordinates[1]
+    }
+
+    function snakeEatsFood() {
+      return (snakeHead.coordinates[0] === food.coordinates[0] && snakeHead.coordinates[1] === food.coordinates[1] )
     }
 
     function handleGameLost() {
@@ -234,6 +187,21 @@ $(document).ready(function() {
       const exitedGifs = ['https://media.giphy.com/media/10ERZqYioLWJ6U/giphy.gif', 'https://media.giphy.com/media/XreQmk7ETCak0/giphy.gif', 'https://media.giphy.com/media/l0MYxef0mpdcnQnvi/giphy.gif', 'https://media.giphy.com/media/jpXAdNRiwGL0k/giphy.gif', "https://media.giphy.com/media/msKNSs8rmJ5m/giphy.gif", "https://media.giphy.com/media/d4blihcFNkwE3fEI/giphy.gif"]
 
       return exitedGifs[Math.floor(Math.random() * exitedGifs.length)]
+    }
+
+    function changeBearing(keycode) {
+      if (snakeHead.bearing != keycode && keycode != oppositeDirections[snakeHead.bearing]) {
+        snakeHead.bearing = keycode
+      }
+    }
+
+    function pushMoveToMoves(snakeHead) {
+      moves.push({
+        coordinates: snakeHead.coordinates.slice(),
+        bearing: snakeHead.bearing
+      })
+      snakeHead.tailBlocks.forEach(tailBlock => tailBlock.moves.push(moves.slice(-1)[0]))
+      snakeHead.bearingChangeChecker = true
     }
 
   })
