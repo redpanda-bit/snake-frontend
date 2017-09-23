@@ -18,14 +18,13 @@ $(document).ready(function() {
     let bottomBound = 391
 
     const moves = []
-    let user = ''
+    let user    = ''
 
     const scoreContainer = $('#score-container')
     const gifContainer   = $('.gif-container')
     let displayingGif    = false
 
-
-
+    //  GAME LOGIC
     let gameFlow = setInterval(function() {
       //snake dies if it hits the wall
       if (notWithinBound()) {
@@ -89,18 +88,17 @@ $(document).ready(function() {
     })
 
 
-    // gives tailblocks the ability to follow the head and turn at the same location the head turned
+
     $(document).on('keydown', function(event) {
-      if (game.gameOn) {
+      if (game.gameOn) { // DONT LISTEN FOR KEY PRESSED IF GAME IS PAUSED/OVER
         event.preventDefault()
       }
-      // check if snakeHead has changed bearing in current coordinates yet
+      // MOVEMENT CONTROLLER
       if (snakeHead.bearingChangeChecker === false) {
         switch (event.keyCode) {
           case 38: //up arrow
             // debugger
             if (game.gameOn && snakeHead.bearing !== "down" && snakeHead.bearing !== "up") {
-              console.log('pressed up and bearing =', snakeHead.bearing)
               snakeHead.bearing = "up"
               moves.push({
                 coordinates: snakeHead.coordinates.slice(),
@@ -110,7 +108,6 @@ $(document).ready(function() {
                 // disallow bearing from changing until snakeHead advances again
               snakeHead.bearingChangeChecker = true
 
-              console.log(moves)
               snakeHead.tailBlocks.forEach(tailBlock => console.log(tailBlock.id, tailBlock.moves))
             }
             break;
@@ -124,7 +121,6 @@ $(document).ready(function() {
               snakeHead.tailBlocks.forEach(tailBlock => tailBlock.moves.push(moves.slice(-1)[0]))
               snakeHead.bearingChangeChecker = true
 
-              console.log(moves)
               snakeHead.tailBlocks.forEach(tailBlock => console.log(tailBlock.id, tailBlock.moves))
             }
             break;
@@ -138,7 +134,6 @@ $(document).ready(function() {
               snakeHead.tailBlocks.forEach(tailBlock => tailBlock.moves.push(moves.slice(-1)[0]))
               snakeHead.bearingChangeChecker = true
 
-              console.log(moves)
               snakeHead.tailBlocks.forEach(tailBlock => console.log(tailBlock.id, tailBlock.moves))
             }
             break;
@@ -152,7 +147,6 @@ $(document).ready(function() {
               snakeHead.tailBlocks.forEach(tailBlock => tailBlock.moves.push(moves.slice(-1)[0]))
               snakeHead.bearingChangeChecker = true
 
-              console.log(moves)
               snakeHead.tailBlocks.forEach(tailBlock => console.log(tailBlock.id, tailBlock.moves))
             }
             break;
