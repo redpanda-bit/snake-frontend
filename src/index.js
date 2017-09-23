@@ -10,7 +10,7 @@ $(document).ready(function() {
 
     playground.append(food.render())
 
-    let snakeAlive = true
+    let snakeAlive  = true
 
     let leftBound   = -1
     let rightBound  = 586
@@ -26,20 +26,16 @@ $(document).ready(function() {
 
     //  GAME LOGIC
     let gameFlow = setInterval(function() {
-      //snake dies if it hits the wall
-      if (notWithinBound()) {
+      if (isNotWithinBound()) {
         handleGameLost()
       }
-      //snake dies if it hits itself
       snakeHead.tailBlocks.some(function(tailBlock) {
         if (snakeAteItself(tailBlock)) {
           handleGameLost()
         }
       })
-
-      //checks if snakehead is in the same place as the food
       function snakeEatsFood() {
-        return (snakeHead.coordinates[0] > (food.coordinates[0] - 15) && snakeHead.coordinates[0] < (food.coordinates[0] + 15)) && (snakeHead.coordinates[1] > (food.coordinates[1] - 15) && snakeHead.coordinates[1] < (food.coordinates[1] + 15))
+        return (snakeHead.coordinates[0] === food.coordinates[0] && snakeHead.coordinates[1] === food.coordinates[1] )
       }
 
       //runs the actual playing of the game
@@ -194,7 +190,7 @@ $(document).ready(function() {
     //
     ///////////////
 
-    function notWithinBound() {
+    function isNotWithinBound() {
       return snakeHead.coordinates[0] <= leftBound || snakeHead.coordinates[0] >= rightBound || snakeHead.coordinates[1] <= topBound || snakeHead.coordinates[1] >= bottomBound
     }
 
