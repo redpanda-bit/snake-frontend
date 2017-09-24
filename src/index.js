@@ -1,66 +1,43 @@
 $(document).ready(function() {
 
-    User.renderUsersAtStart()
+  User.renderUsersAtStart()
 
-    const snakeHead = new SnakeHead()
-    const game      = new Game(snakeHead)
-    let food        = new Food()
+  const snakeHead = new SnakeHead()
+  const game      = new Game(snakeHead)
+  let food        = new Food()
 
-    const playground = $('#game-container')
+  const playground = $('#game-container')
 
-    playground.append(food.render())
+  playground.append(food.render())
 
-    let snakeAlive  = true
+  let snakeAlive  = true
 
-    let leftBound   = -1
-    let rightBound  = 586
-    let topBound    = -1
-    let bottomBound = 391
+  let leftBound   = -1
+  let rightBound  = 586
+  let topBound    = -1
+  let bottomBound = 391
+  
+  const DIRECTIONS         = [ 37, 38, 39, 40 ]  
+  const oppositeDirections = { 37: 39, 38: 40, 39: 37, 40: 38 }
+
+  const moves = []
+  let user    = ''
+
+  const scoreContainer = $('#score-container')
+  const gifContainer   = $('.gif-container')
+  let displayingGif    = false
+
+  //  GAME LOGIC
+  let gameFlow = setInterval(function() {
     
-    const DIRECTIONS         = [ 37, 38, 39, 40 ]  
-    const oppositeDirections = { 37: 39, 38: 40, 39: 37, 40: 38 }
+    if (isNotWithinBound() || snakeAteItself()) handleGameLost()
+    
+    if (snakeAlive && game.gameOn) snakeHead.advance();Tail.advanceAll()
+    
+    if (snakeEatsFood()) handleFoodEaten()
 
-    const moves = []
-    let user    = ''
-
-    const scoreContainer = $('#score-container')
-    const gifContainer   = $('.gif-container')
-    let displayingGif    = false
-
-    //  GAME LOGIC
-    let gameFlow = setInterval(function() {
-      if (isNotWithinBound()) {
-        handleGameLost()
-      }
-      snakeHead.tailBlocks.some(function(tailBlock) {
-        if (snakeAteItself(tailBlock)) {
-          handleGameLost()
-        }
-      })
-
-      if (snakeAlive && game.gameOn) {
-
-        snakeHead.advance()
-
-        Tail.advanceAll()
-
-        if (snakeEatsFood()) {
-
-          food = new Food()
-          playground.html(food.render())
-
-          let snakeTail = new Tail(snakeHead)
-
-          scoreContainer.html(`<div id="score" class="">Score:<span style="color: darkred">${game.score()}</span></div>`)
-
-          if (game.score() / 100 > 1 && !displayingGif) {
-            displayGif("exited")
-          }
-        }
-        playground.html(snakeHead.render() + Tail.renderAll() + food.render())
-      }
-
-    }, 50)
+    renderUpdatedGame()
+  }, 50)
 
 
 // ////////
@@ -133,18 +110,35 @@ $(document).ready(function() {
     })
 
 
-    ////////////////
-    //
-    // HELPER FUNCTIONS 
-    //
-    ///////////////
+////////////////
+//
+// HELPER FUNCTIONS 
+//
+///////////////
+    function handleFoodEaten() {
+      food = new Food()
+      playground.html(food.render())
+      let snakeTail = new Tail(snakeHead)
+      scoreContainer.html(`<div id="score" class="">Score:<span style="color: darkred">${game.score()}</span></div>`)
+      if (game.score() / 100 > 1 && !displayingGif) {
+        displayGif("exited")
+      }
+    }
+
+    function renderUpdatedGame() {
+      snakeHead.delete()
+      Tail.deleteAll()
+      playground.append(snakeHead.render() + Tail.renderAll())
+    }
 
     function isNotWithinBound() {
       return snakeHead.coordinates[0] <= leftBound || snakeHead.coordinates[0] >= rightBound || snakeHead.coordinates[1] <= topBound || snakeHead.coordinates[1] >= bottomBound
     }
 
-    function snakeAteItself(tailBlock) {
-      return snakeHead.coordinates[0] === tailBlock.coordinates[0] && snakeHead.coordinates[1] === tailBlock.coordinates[1]
+    function snakeAteItself() {
+      return snakeHead.tailBlocks.some(function(tailBlock) {
+        return snakeHead.coordinates[0] === tailBlock.coordinates[0] && snakeHead.coordinates[1] === tailBlock.coordinates[1]
+      })
     }
 
     function snakeEatsFood() {
